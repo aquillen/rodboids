@@ -5,7 +5,7 @@ var flock;
 const canvas_size = 600;
 const rad_fac = 0.70;  // sets radius of bubble
 const dx = 1;          // grid spacing
-const dt = 0.3;        // timestep
+const dt = 0.5;        // timestep
 
 const nnodes  = 80;   // numbers of mass nodes
 const node_mass = 6;  // mass of nodes
@@ -23,25 +23,37 @@ const force_k = 0.2;    // 1/scale for interactions between boids and nodes
 const vforce_amp = 0.00;  // damping for boid/node interaction
 
 // boid forces
-const d_repel = 50;
-const d_attract = 20;  // scale over which attractive force applies
-const d_align = 40; // scale for alignment
-const d_rotate = 50;
-const d_anglepush = 20.0;
-const d_vforce = 10; // velocity damping
+const d_repel = 50.;
+const d_attract = 20.;  // scale over which attractive force applies
+const d_align = 40.; // scale for alignment, not used?
+const d_rotate = 50.;  // scale for rotational alignment
+const d_anglepush = 20.0;  // scale for pushing when close together
+const d_vforce = 10; // scale for velocity damping
 
 // units acceleration
-const attract_force = 0.00*boid_mass; // amplitude of attract force
-const repel_force = 0.01*boid_mass;  // repel
-const align_force = 0.05*boid_mass;
-const anglepush_force = 0.01*boid_mass;
-const rotate_force = 0.003*boid_mass;
+const attract_force = 0.0*boid_mass; // amplitude of attract force, not used
+const repel_force = 0.0*boid_mass;  // repel not used
+const align_force = 0.0*boid_mass; // not used
+const anglepush_force = 0.02*boid_mass;  // push away according to orientation if nearby
+const rotate_force = 0.003*boid_mass; // align orienations by rotating angles
 const vforce_force = 0.1*boid_mass; // velocity damping
 
 const boidspeed = 1;  // speed of self propulsion
 
 // for display/draw updates 
-const ndt=2;
+const ndt=3;
+
+// sliders 
+var anglepush_force_Tslider; 
+var d_anglepush_Tslider;
+var vforce_force_Tslider; 
+var d_vforce_Tslider;
+// var align_force_Tslider;
+// var d_align_Tslider;
+var gamma_node_Tslider;
+var ks_Tslider;
+var d_rotate_Tslider;
+var rotate_force_Tslider;
 
 const propel_force = 1; // not currently used
 
@@ -53,7 +65,7 @@ function setup() {
   let big_radius = rad_fac*xwidth/2;
   
   // create a mass spring system
-  mass_spring_system = new Mass_spring_system(nnodes,big_radius);
+  mass_spring_system = new Mass_spring_system(nnodes,big_radius,node_mass);
   mass_spring_system.display_springs(); // display springs
   mass_spring_system.display_nodes(); // display nodes
   
@@ -63,6 +75,22 @@ function setup() {
   // let boid_set = flock.boid_set;
   // let node_set = mass_spring_system.node_set;
   // boid_node_interact(boid_set,node_set,force_amp,force_k,vforce_amp);
+  
+  // set up some sliders
+  anglepush_force_Tslider = new Tslider(0,'anglep',0,anglepush_force); 
+  flock.anglepush_force = anglepush_force;
+  d_anglepush_Tslider = new Tslider(1,'d_anglep',0,d_anglepush); 
+  flock.d_anglepush = d_anglepush;
+  
+  rotate_force_Tslider = new Tslider(2,'rotate',0,rotate_force); 
+  flock.rotate_force = rotate_force;
+  d_rotate_Tslider = new Tslider(3,'d_rotate',0,d_rotate); 
+  flock.d_rotate = d_rotate;
+  
+  vforce_force_Tslider = new Tslider(4,'vforce',0,vforce_force); 
+  flock.vforce_force = rotate_force;
+  d_vforce_Tslider = new Tslider(5,'d_vforce',0,d_vforce); 
+  flock.d_vforce = d_vforce;
 }
 
 var dcount=0;  // for centroiding
@@ -106,6 +134,18 @@ function draw() {
       }
     }
   }
+  flock.anglepush_force = anglepush_force_Tslider.slider.value();
+  flock.rotate_force = rotate_force_Tslider.slider.value();
+  flock.vforce_force = vforce_force_Tslider.slider.value();
+  flock.d_anglepush = d_anglepush_Tslider.slider.value();
+  flock.d_rotate = d_rotate_Tslider.slider.value();
+  flock.d_vforce = d_vforce_Tslider.slider.value();
+  anglepush_force_Tslider.text();
+  rotate_force_Tslider.text();
+  vforce_force_Tslider.text();
+  d_anglepush_Tslider.text();
+  d_rotate_Tslider.text();
+  d_vforce_Tslider.text();  
 }
 
 
