@@ -181,8 +181,9 @@ function boid_node_interact(boid_set,node_set,
         a_node.div( nodei.m); // acceleration
         boidj.acceleration.add(a_boid);
         nodei.acceleration.add(a_node);
-        let theta = atan2(drhat.y,drhat.x) + PI/2;
-        boidj.phidot = sin(2*(theta-boidj.phi));        
+        let theta = atan2(drhat.y,drhat.x)  + PI/2;  
+        // tan is zero if vector between is || to orientation of rod
+        boidj.phidot += 0.5*sin(2*(theta-boidj.phi));        
       }
     }
   }

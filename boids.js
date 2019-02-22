@@ -7,7 +7,7 @@ function Boid(dxx) {
   let xw = 130;
   this.position = createVector(random(-xw,xw),random(-xw,xw));
   this.phi = random(0,2*PI);
-  this.phidot = 0.0;
+  this.phidot = random(0,1);
   this.r = 5.0;  // for display and in pixels
   this.m = boid_mass;
   this.dx = dxx; // scale multiply by this to get pixels, used in display
@@ -24,16 +24,19 @@ Boid.prototype.render = function() {
   strokeWeight(1);
   translate(0,0);
   translate(width/2+this.position.x*this.dx,height/2+this.position.y*this.dx);
-  rotate(theta);
+  
+  rotate(theta); 
   beginShape();
   vertex(0, -this.r*2);
   vertex(-this.r, this.r*2);
   vertex(this.r, this.r*2);
   endShape(CLOSE);
-  rotate(-theta + this.phi);
+  rotate(-theta);
+
   rotate(this.phi);
   fill('rgb(50,100,250)');
   ellipse(0,0,6*this.r,this.r);
+  rotate(-this.phi);
   pop();
       
 }
@@ -282,12 +285,10 @@ function Flock(nboids) {
     
   this.rotate = function(){
     let n = this.boid_set.length;
-    for (let i = 0; i < n; i++) {
-       let count = 0;
+    for (let i = 0; i < n-1; i++) {
+       //let count = 0;
        let bi = this.boid_set[i];
-       // let steer = createVector(0,0);  // from average of nearest neighbor velocities
-       let v_ave = createVector(0,0);
-       for (let j = i; j < n-1; j++) {
+       for (let j = i+1; j < n; j++) {
          let bj = this.boid_set[j];
          let dr = p5.Vector.dist(bi.position,bj.position);
          if (dr<this.d_rotate){
